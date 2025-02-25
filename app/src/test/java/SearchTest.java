@@ -2,6 +2,7 @@ import hexlet.code.SearchEngine;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +16,6 @@ class SearchTest {
         var doc2 = "Don't shoot shoot shoot that thing at me.";
         var doc3 = "I'm your shooter.";
 
-        // создание документа
-        // документ имеет два атрибута "id" и "text"
         List<Map<String, String>> docs = List.of(
                 Map.of("id", "doc1", "text", doc1),
                 Map.of("id", "doc2", "text", doc2),
@@ -27,7 +26,7 @@ class SearchTest {
         List<String> result = SearchEngine.search(docs, "shoot");
 
         System.out.println(result); // => ["doc1", "doc2"]
-        assertEquals(List.of("doc1", "doc2"), result);
+        assertEquals(List.of("doc2", "doc1"), result);
 
         // Документы пусты
         result = SearchEngine.search(new ArrayList<>(), "shoot"); // []
@@ -44,11 +43,46 @@ class SearchTest {
                 Map.of("id", "doc1", "text", doc1));
 
         List<String> result = SearchEngine.search(docs, "pint");
-        System.out.println(result); // => ["doc1"]
+        System.out.println(result);
         assertEquals(List.of("doc1"), result);
 
         result = SearchEngine.search(docs, "pint!");
-        System.out.println(result); // => ["doc1"]
+        System.out.println(result);
         assertEquals(List.of("doc1"), result);
+    }
+
+    @Test
+    void testWithRelevance() {
+        var doc1 = "I can't shoot straight unless I've had a pint!";
+        var doc2 = "Don't shoot shoot shoot that thing at me.";
+        var doc3 = "I'm your shooter.";
+
+        List<Map<String, String>> docs = List.of(
+                Map.of("id", "doc1", "text", doc1),
+                Map.of("id", "doc2", "text", doc2),
+                Map.of("id", "doc3", "text", doc3)
+        );
+
+        List<String> result = SearchEngine.search(docs, "shoot");
+        System.out.println(result);
+        assertEquals(List.of("doc2", "doc1"), result);
+
+        doc1 = "I can't ... mmmm noodleSoup ... I've had a pint!";
+        doc2 = "noodleSoup, noodleSoup";
+        doc3 = "Beetlejuice, Beetlejuice ... noodleSoup, noodleSoup, noodleSoup";
+        var doc4 = "noodleSoup, noodleSoup,noodleSoup, noodleSoup, noodleSoup";
+        var doc5 = "test mb?";
+
+        docs = List.of(
+                Map.of("id", "doc2", "text", doc2),
+                Map.of("id", "doc1", "text", doc1),
+                Map.of("id", "doc3", "text", doc3),
+                Map.of("id", "doc5", "text", doc5),
+                Map.of("id", "doc4", "text", doc4)
+        );
+
+        result = SearchEngine.search(docs, "noodleSoup");
+        System.out.println(result);
+        assertEquals(List.of("doc4", "doc3", "doc2", "doc1"), result);
     }
 }
