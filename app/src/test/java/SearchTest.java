@@ -2,6 +2,7 @@ import hexlet.code.SearchEngine;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -102,5 +103,23 @@ class SearchTest {
         List<String> result = SearchEngine.search(docs, "shoot at me");
         assertEquals(List.of("doc2", "doc4", "doc1"), result);
         System.out.println("PASSED: testWithMultipleInput_1     " + result);
+    }
+
+    @Test
+    void testIndex() {
+        List<Map<String, String>> docs = List.of(
+                Map.of("id", "doc1", "text", "some text"),
+                Map.of("id", "doc2", "text", "some text too")
+        );
+
+        Map<String, List<String>> index = Map.of(
+                "some", List.of("doc1", "doc2"),
+                "text", List.of("doc1", "doc2"),
+                "too", List.of("doc2")
+        );
+
+        Map<String, ArrayList<String>> result = SearchEngine.getIndexMap(docs, "some text too");
+        assertEquals(index, result);
+        System.out.println("PASSED: testIndex     " + result);
     }
 }

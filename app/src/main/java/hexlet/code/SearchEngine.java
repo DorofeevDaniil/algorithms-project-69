@@ -7,6 +7,8 @@ import java.util.stream.Collectors;
 
 public class SearchEngine {
 
+    private static HashMap<String, ArrayList<String>> indexMap;
+
     public static List<String> search(List<Map<String, String>> inputList, String searchStr) {
         List<String> resultList = new ArrayList<>();
         List<Map<String, Object>> relevanceList = new ArrayList<>();
@@ -54,7 +56,7 @@ public class SearchEngine {
     }
 
     private static String getCleanStr(String inputStr) {
-        return Pattern.compile("\\w+")
+        return Pattern.compile("[\\s,\\w+]")
                 .matcher(inputStr)
                 .results()
                 .map(MatchResult::group)
@@ -78,5 +80,30 @@ public class SearchEngine {
         });
 
         return unsortedList;
+    }
+
+    public static Map<String, ArrayList<String>> getIndexMap(List<Map<String, String>> inputList, String searchStr) {
+        if (indexMap != null) {
+            return indexMap;
+        }
+
+        indexMap = new HashMap<>();
+        String[] requestTerm = searchStr.toLowerCase().split(" ");
+
+        for (String checkStr : requestTerm) {
+            ArrayList<String> innerList = new ArrayList<>();
+            for (Map<String, String> mp : inputList) {
+                String[] textArray = mp.get("text").toLowerCase().split("\\W+");
+                Optional<String> present = Arrays
+                                            .stream(textArray)
+                                            .filter(x -> getCleanStr(x).equals(getCleanStr(checkStr)))
+                                            .findFirst();
+                if (present.isPresent()) innerList.add(mp.get("id"));
+            }
+
+            if (!innerList.isEmpty()) indexMap.put(checkStr, innerList);
+        }
+
+        return indexMap;
     }
 }
