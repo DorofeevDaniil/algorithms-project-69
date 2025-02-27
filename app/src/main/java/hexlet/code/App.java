@@ -18,5 +18,6 @@ public class App {
         );
 
         System.out.println(SearchEngine.search(docs, "shoot me")); // [doc4, doc2, doc1, doc3]
+        System.out.println("main test done");
     }
 }
