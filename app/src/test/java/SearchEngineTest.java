@@ -29,30 +29,30 @@ class SearchEngineTest {
                 assertThat(result).isEqualTo(correct);
         }
 
-//     @Test
-//    void searchMultipleWordsTest() {
-//                List<String> result = SearchEngine.search(DOCS, "shoot me");
-//                List<String> correct = List.of("doc4", "doc2", "doc1", "doc3");
-//
-//                assertThat(result).isEqualTo(correct);
-//        }
-//
-//    @Test
-//    void searchWithEmptyTest() {
-//                List<String> result1 = SearchEngine.search(new ArrayList<>(), "shoot");
-//                List<String> result2 = SearchEngine.search(DOCS, "");
-//                List<String> result3 = SearchEngine.search(DOCS, "qwerty");
-//
-//                assertThat(result1).isEmpty();
-//                assertThat(result2).isEmpty();
-//                assertThat(result3).isEmpty();
-//        }
-//
-//     @Test
-//     void searchWithRelevanceOrder() {
-//                List<String> result = SearchEngine.search(DOCS, "me");
-//                List<String> correct = List.of("doc4", "doc3", "doc2", "doc1");
-//
-//                assertThat(result).isEqualTo(correct);
-//        }
+     @Test
+    void searchMultipleWordsTest() {
+                List<String> result = SearchEngine.search(DOCS, "shoot me");
+                List<String> correct = List.of("doc4", "doc2", "doc1", "doc3");
+
+                assertThat(result).isEqualTo(correct);
+        }
+
+    @Test
+    void searchWithEmptyTest() {
+                List<String> result1 = SearchEngine.search(new ArrayList<>(), "shoot");
+                List<String> result2 = SearchEngine.search(DOCS, "");
+                List<String> result3 = SearchEngine.search(DOCS, "qwerty");
+
+                assertThat(result1).isEmpty();
+                assertThat(result2).isEmpty();
+                assertThat(result3).isEmpty();
+        }
+
+     @Test
+     void searchWithRelevanceOrder() {
+                List<String> result = SearchEngine.search(DOCS, "me");
+                List<String> correct = List.of("doc4", "doc3", "doc2", "doc1");
+
+                assertThat(result).isEqualTo(correct);
+        }
 }
