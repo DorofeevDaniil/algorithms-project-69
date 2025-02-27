@@ -17,6 +17,7 @@ public class SearchEngine {
     }
 
     public static List<String> search(List<Map<String, String>> inputList, String searchStr) {
+        if (searchStr.isEmpty()) return new ArrayList<>();
         if (indexMap.isEmpty()) getInitialIndexMap(inputList);
 
         List<Map<Double, String>> relevanceList = new ArrayList<>();
@@ -26,7 +27,8 @@ public class SearchEngine {
             Double docRelevance = 0.0;
             HashMap<Double, String> relevanceMap = new HashMap<>();
             for (String checkStr : getCleanStr(searchStr.toLowerCase()).split(" ")) {
-                docRelevance += indexMap.get(checkStr).get(mp.get("id"));
+                HashMap<String, Double> innerIndex = indexMap.getOrDefault(checkStr, new HashMap<>());
+                docRelevance += innerIndex.getOrDefault(mp.get("id"), 0.0);
             }
 
             if (docRelevance != 0.0) {
@@ -43,7 +45,7 @@ public class SearchEngine {
     }
 
     private static String getCleanStr(String inputStr) {
-        return Pattern.compile("[\\s,\\w+]")
+        return Pattern.compile("[\\s\\w+]")
                 .matcher(inputStr)
                 .results()
                 .map(MatchResult::group)
@@ -65,7 +67,8 @@ public class SearchEngine {
     public static HashMap<String, HashMap<String, Double>> getInitialIndexMap(List<Map<String, String>> inputList) {
 
         for (Map<String, String> mp : inputList) {
-            for(String word : mp.get("text").toLowerCase().split("\\W+")) {
+            System.out.println(getCleanStr(mp.get("text").toLowerCase()));
+            for(String word : getCleanStr(mp.get("text").toLowerCase()).split(" ")) {
                 if (!indexMap.containsKey(word)) {
                     setWordTFIDList(inputList, word);
                 }
@@ -84,8 +87,6 @@ public class SearchEngine {
                 innerMap.put(mp.get("id"), 0.0);
             }
 
-            collectionVolume++;
-
             int documentVolume = 0;
             String[] textArray = getCleanStr(mp.get("text").toLowerCase()).split("\\W+");
             int docSize = textArray.length;
@@ -95,12 +96,13 @@ public class SearchEngine {
                     documentVolume++;
                 }
             }
-
+            if (documentVolume != 0.0) collectionVolume++;
             innerMap.put(mp.get("id"), (double) documentVolume / docSize);
         }
 
         for (String key : innerMap.keySet()) {
-            innerMap.put(key, innerMap.get(key) * Math.log(((double) collectionVolume / inputList.size() + 0.5)));
+            innerMap.put(key, innerMap.get(key) * Math.log(1 + (inputList.size() - collectionVolume + 1) / (collectionVolume + 0.5)));
+
         }
 
         indexMap.put(checkWord, innerMap);
