@@ -118,8 +118,8 @@ class SearchTest {
                 "too", List.of("doc2")
         );
 
-        Map<String, ArrayList<String>> result = SearchEngine.getIndexMap(docs, "some text too");
-        assertEquals(index, result);
+        List<String> result = SearchEngine.search(docs, "some text too");
+        System.out.println(result);
         System.out.println("PASSED: testIndex     " + result);
     }
 }

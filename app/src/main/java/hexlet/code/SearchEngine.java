@@ -6,51 +6,38 @@ import java.util.regex.MatchResult;
 import java.util.stream.Collectors;
 
 public class SearchEngine {
+    private static final HashMap<String, HashMap<String, Double>> indexMap = new HashMap<>();
 
-    private static HashMap<String, ArrayList<String>> indexMap;
+    public SearchEngine (List<Map<String, String>> inputList) {
+        getInitialIndexMap(inputList);
+    }
+
+    public HashMap<String, HashMap<String, Double>> getIndexMap() {
+        return  indexMap;
+    }
 
     public static List<String> search(List<Map<String, String>> inputList, String searchStr) {
-        List<String> resultList = new ArrayList<>();
-        List<Map<String, Object>> relevanceList = new ArrayList<>();
+        if (indexMap.isEmpty()) getInitialIndexMap(inputList);
 
-        String[] requestTerm = searchStr.toLowerCase().split(" ");
+        List<Map<Double, String>> relevanceList = new ArrayList<>();
+        List<String> resultList = new ArrayList<>();
 
         for (Map<String, String> mp : inputList) {
-            HashMap<String, Object> innerMap = new HashMap<>();
-
-            int wordCount = 0;
-            int entryCount = 0;
-
-            for (String checkStr : requestTerm) {
-
-                String[] textArray = mp.get("text").toLowerCase().split("\\W+");
-                int currRelevance = 0;
-
-                for (String str : textArray) {
-                    if (getCleanStr(str).equals(getCleanStr(checkStr))) {
-                        currRelevance++;
-                    }
-                }
-
-                if (currRelevance > 0) {
-                    entryCount += currRelevance;
-                    wordCount++;
-                    innerMap.put("wordCount", wordCount);
-                    innerMap.put("entryCount", entryCount);
-                }
+            Double docRelevance = 0.0;
+            HashMap<Double, String> relevanceMap = new HashMap<>();
+            for (String checkStr : getCleanStr(searchStr.toLowerCase()).split(" ")) {
+                docRelevance += indexMap.get(checkStr).get(mp.get("id"));
             }
 
-            if (!innerMap.isEmpty()) {
-                innerMap.put("id", mp.get("id"));
-                relevanceList.add(innerMap);
+            if (docRelevance != 0.0) {
+                relevanceMap.put(docRelevance, mp.get("id"));
+                relevanceList.add(relevanceMap);
             }
-
         }
 
-        for (Map<String, Object> curr : getSortedKeyList(relevanceList)) {
-            resultList.add(curr.get("id").toString());
+        for (Map<Double, String> curr : getSortedDocKeyList(relevanceList)) {
+            resultList.add(curr.values().stream().toList().get(0));
         }
-
 
         return resultList;
     }
@@ -63,47 +50,59 @@ public class SearchEngine {
                 .collect(Collectors.joining());
     }
 
-    private static List<Map<String, Object>> getSortedKeyList(List<Map<String, Object>> unsortedList) {
-        Collections.sort(unsortedList, new Comparator<Map<String, Object>>() {
+    private static List<Map<Double, String>> getSortedDocKeyList(List<Map<Double, String>> unsortedList) {
+        Collections.sort(unsortedList, new Comparator<Map<Double, String>>() {
 
             @Override
-            public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-
-                int compareVolume = ((Integer) o2.get("wordCount")).compareTo(((Integer) o1.get("wordCount")));
-
-                if (compareVolume == 0) {
-                    compareVolume = ((Integer) o2.get("entryCount")).compareTo(((Integer) o1.get("entryCount")));
-                }
-
-                return compareVolume;
+            public int compare(Map<Double, String> o1, Map<Double, String> o2) {
+                return o2.keySet().stream().toList().get(0).compareTo(o1.keySet().stream().toList().get(0));
             }
         });
 
         return unsortedList;
     }
 
-    public static Map<String, ArrayList<String>> getIndexMap(List<Map<String, String>> inputList, String searchStr) {
-        if (indexMap != null) {
-            return indexMap;
-        }
+    public static HashMap<String, HashMap<String, Double>> getInitialIndexMap(List<Map<String, String>> inputList) {
 
-        indexMap = new HashMap<>();
-        String[] requestTerm = searchStr.toLowerCase().split(" ");
-
-        for (String checkStr : requestTerm) {
-            ArrayList<String> innerList = new ArrayList<>();
-            for (Map<String, String> mp : inputList) {
-                String[] textArray = mp.get("text").toLowerCase().split("\\W+");
-                Optional<String> present = Arrays
-                                            .stream(textArray)
-                                            .filter(x -> getCleanStr(x).equals(getCleanStr(checkStr)))
-                                            .findFirst();
-                if (present.isPresent()) innerList.add(mp.get("id"));
+        for (Map<String, String> mp : inputList) {
+            for(String word : mp.get("text").toLowerCase().split("\\W+")) {
+                if (!indexMap.containsKey(word)) {
+                    setWordTFIDList(inputList, word);
+                }
             }
-
-            if (!innerList.isEmpty()) indexMap.put(checkStr, innerList);
         }
 
         return indexMap;
+    }
+
+    private static void setWordTFIDList(List<Map<String, String>> inputList, String checkWord) {
+        HashMap<String, Double> innerMap = new HashMap<>();
+        int collectionVolume = 0;
+        for (Map<String, String> mp : inputList) {
+
+            if (!getCleanStr(mp.get("text").toLowerCase()).contains(checkWord)) {
+                innerMap.put(mp.get("id"), 0.0);
+            }
+
+            collectionVolume++;
+
+            int documentVolume = 0;
+            String[] textArray = getCleanStr(mp.get("text").toLowerCase()).split("\\W+");
+            int docSize = textArray.length;
+
+            for(String word : textArray) {
+                if (word.equals(getCleanStr(checkWord))) {
+                    documentVolume++;
+                }
+            }
+
+            innerMap.put(mp.get("id"), (double) documentVolume / docSize);
+        }
+
+        for (String key : innerMap.keySet()) {
+            innerMap.put(key, innerMap.get(key) * Math.log(((double) collectionVolume / inputList.size() + 0.5)));
+        }
+
+        indexMap.put(checkWord, innerMap);
     }
 }
