@@ -1,11 +1,7 @@
-import hexlet.code.SearchEngine;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 class SearchEngineTest {
         public static final String DOC1 = "I can't shoot straight unless I've had a pint! Pour me!";
