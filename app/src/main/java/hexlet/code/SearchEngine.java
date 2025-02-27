@@ -14,17 +14,9 @@ import java.util.stream.Collectors;
 public class SearchEngine {
     private static final HashMap<String, HashMap<String, Double>> INDEX_MAP = new HashMap<>();
 
-    public SearchEngine (List<Map<String, String>> inputList) {
-        getInitialINDEX_MAP(inputList);
-    }
-
-    public HashMap<String, HashMap<String, Double>> getINDEX_MAP() {
-        return  INDEX_MAP;
-    }
-
     public static List<String> search(List<Map<String, String>> inputList, String searchStr) {
         if (searchStr.isEmpty()) return new ArrayList<>();
-        if (INDEX_MAP.isEmpty()) getInitialINDEX_MAP(inputList);
+        if (INDEX_MAP.isEmpty()) getInitialIndexMap(inputList);
 
         List<Map<Double, String>> relevanceList = new ArrayList<>();
         List<String> resultList = new ArrayList<>();
@@ -70,11 +62,10 @@ public class SearchEngine {
         return unsortedList;
     }
 
-    public static HashMap<String, HashMap<String, Double>> getInitialINDEX_MAP(List<Map<String, String>> inputList) {
+    public static HashMap<String, HashMap<String, Double>> getInitialIndexMap(List<Map<String, String>> inputList) {
 
         for (Map<String, String> mp : inputList) {
-            System.out.println(getCleanStr(mp.get("text").toLowerCase()));
-            for(String word : getCleanStr(mp.get("text").toLowerCase()).split(" ")) {
+            for (String word : getCleanStr(mp.get("text").toLowerCase()).split(" ")) {
                 if (!INDEX_MAP.containsKey(word)) {
                     setWordTFIDList(inputList, word);
                 }
@@ -97,7 +88,7 @@ public class SearchEngine {
             String[] textArray = getCleanStr(mp.get("text").toLowerCase()).split("\\W+");
             int docSize = textArray.length;
 
-            for(String word : textArray) {
+            for (String word : textArray) {
                 if (word.equals(getCleanStr(checkWord))) {
                     documentVolume++;
                 }
