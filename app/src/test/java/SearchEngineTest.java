@@ -23,42 +23,42 @@ class SearchEngineTest {
 
     @Test
     void testSearchOneWord() {
-      List<String> result = SearchEngine.search(DOCS, "pint");
-      List<String> correct = List.of("doc1");
+        List<String> result = SearchEngine.search(DOCS, "pint");
+        List<String> correct = List.of("doc1");
 
-      assertEquals(correct, result);
-      System.out.println("PASSED: testSearchOneWord");
+        assertEquals(correct, result);
+        System.out.println("PASSED: testSearchOneWord");
     }
 
     @Test
     void testSearchMultipleWords() {
-      List<String> result = SearchEngine.search(DOCS, "shoot me");
-      List<String> correct = List.of("doc4", "doc2", "doc3", "doc1");
+        List<String> result = SearchEngine.search(DOCS, "shoot me");
+        List<String> correct = List.of("doc4", "doc2", "doc3", "doc1");
 
-      assertEquals(correct, result);
-      System.out.println("PASSED: testSearchMultipleWords");
+        assertEquals(correct, result);
+        System.out.println("PASSED: testSearchMultipleWords");
     }
 
     @Test
     void testSearchWithEmpty() {
-      List<String> result = SearchEngine.search(new ArrayList<>(), "shoot");
-      assertThat(result).isEmpty();
+        List<String> result = SearchEngine.search(new ArrayList<>(), "shoot");
+        assertThat(result).isEmpty();
 
-      result = SearchEngine.search(DOCS, "");
-      assertThat(result).isEmpty();
+        result = SearchEngine.search(DOCS, "");
+        assertThat(result).isEmpty();
 
-      result = SearchEngine.search(DOCS, "test");
-      assertThat(result).isEmpty();
+        result = SearchEngine.search(DOCS, "test");
+        assertThat(result).isEmpty();
 
-      System.out.println("PASSED: testSearchWithEmpty");
+        System.out.println("PASSED: testSearchWithEmpty");
     }
 
     @Test
     void testSearchWithRelevanceOrder() {
-      List<String> result = SearchEngine.search(DOCS, "me");
-      List<String> correct = List.of("doc4", "doc3", "doc2");
+        List<String> result = SearchEngine.search(DOCS, "me");
+        List<String> correct = List.of("doc4", "doc3", "doc2");
 
-      assertEquals(correct, result);
-      System.out.println("PASSED: testSearchWithRelevanceOrder");
+        assertEquals(correct, result);
+        System.out.println("PASSED: testSearchWithRelevanceOrder");
     }
 }
