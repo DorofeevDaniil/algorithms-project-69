@@ -19,7 +19,6 @@ class SearchEngineTest {
         @Test
         void searchOneWordTest() {
             List<String> correct = List.of("doc1");
-
             System.out.println(correct);
         }
 }

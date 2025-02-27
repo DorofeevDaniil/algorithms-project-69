@@ -1,6 +1,5 @@
 package hexlet.code;
 
-//import java.util.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,8 +14,12 @@ public class SearchEngine {
     private static final HashMap<String, HashMap<String, Double>> INDEX_MAP = new HashMap<>();
 
     public static List<String> search(List<Map<String, String>> inputList, String searchStr) {
-        if (searchStr.isEmpty()) return new ArrayList<>();
-        if (INDEX_MAP.isEmpty()) getInitialIndexMap(inputList);
+        if (searchStr.isEmpty()) {
+            return new ArrayList<>();
+        }
+        if (INDEX_MAP.isEmpty()) {
+            getInitialIndexMap(inputList);
+        }
 
         List<Map<Double, String>> relevanceList = new ArrayList<>();
         List<String> resultList = new ArrayList<>();
@@ -100,7 +103,8 @@ public class SearchEngine {
         }
 
         for (String key : innerMap.keySet()) {
-            innerMap.put(key, innerMap.get(key) * Math.log(1 + (inputList.size() - collectionVolume + 1) / (collectionVolume + 0.5)));
+            innerMap.put(key, innerMap.get(key) * Math.log(
+                    1 + (inputList.size() - collectionVolume + 1) / (collectionVolume + 0.5)));
 
         }
 
