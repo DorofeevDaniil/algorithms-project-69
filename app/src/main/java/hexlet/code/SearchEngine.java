@@ -1,24 +1,30 @@
 package hexlet.code;
 
-import java.util.*;
+//import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.regex.Pattern;
 import java.util.regex.MatchResult;
 import java.util.stream.Collectors;
 
 public class SearchEngine {
-    private static final HashMap<String, HashMap<String, Double>> indexMap = new HashMap<>();
+    private static final HashMap<String, HashMap<String, Double>> INDEX_MAP = new HashMap<>();
 
     public SearchEngine (List<Map<String, String>> inputList) {
-        getInitialIndexMap(inputList);
+        getInitialINDEX_MAP(inputList);
     }
 
-    public HashMap<String, HashMap<String, Double>> getIndexMap() {
-        return  indexMap;
+    public HashMap<String, HashMap<String, Double>> getINDEX_MAP() {
+        return  INDEX_MAP;
     }
 
     public static List<String> search(List<Map<String, String>> inputList, String searchStr) {
         if (searchStr.isEmpty()) return new ArrayList<>();
-        if (indexMap.isEmpty()) getInitialIndexMap(inputList);
+        if (INDEX_MAP.isEmpty()) getInitialINDEX_MAP(inputList);
 
         List<Map<Double, String>> relevanceList = new ArrayList<>();
         List<String> resultList = new ArrayList<>();
@@ -27,7 +33,7 @@ public class SearchEngine {
             Double docRelevance = 0.0;
             HashMap<Double, String> relevanceMap = new HashMap<>();
             for (String checkStr : getCleanStr(searchStr.toLowerCase()).split(" ")) {
-                HashMap<String, Double> innerIndex = indexMap.getOrDefault(checkStr, new HashMap<>());
+                HashMap<String, Double> innerIndex = INDEX_MAP.getOrDefault(checkStr, new HashMap<>());
                 docRelevance += innerIndex.getOrDefault(mp.get("id"), 0.0);
             }
 
@@ -64,18 +70,18 @@ public class SearchEngine {
         return unsortedList;
     }
 
-    public static HashMap<String, HashMap<String, Double>> getInitialIndexMap(List<Map<String, String>> inputList) {
+    public static HashMap<String, HashMap<String, Double>> getInitialINDEX_MAP(List<Map<String, String>> inputList) {
 
         for (Map<String, String> mp : inputList) {
             System.out.println(getCleanStr(mp.get("text").toLowerCase()));
             for(String word : getCleanStr(mp.get("text").toLowerCase()).split(" ")) {
-                if (!indexMap.containsKey(word)) {
+                if (!INDEX_MAP.containsKey(word)) {
                     setWordTFIDList(inputList, word);
                 }
             }
         }
 
-        return indexMap;
+        return INDEX_MAP;
     }
 
     private static void setWordTFIDList(List<Map<String, String>> inputList, String checkWord) {
@@ -96,7 +102,9 @@ public class SearchEngine {
                     documentVolume++;
                 }
             }
-            if (documentVolume != 0.0) collectionVolume++;
+            if (documentVolume != 0.0) {
+                collectionVolume++;
+            }
             innerMap.put(mp.get("id"), (double) documentVolume / docSize);
         }
 
@@ -105,6 +113,6 @@ public class SearchEngine {
 
         }
 
-        indexMap.put(checkWord, innerMap);
+        INDEX_MAP.put(checkWord, innerMap);
     }
 }
